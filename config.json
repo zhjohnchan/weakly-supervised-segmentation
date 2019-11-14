@@ -1,16 +1,17 @@
 {
-    "name": "Mnist_LeNet",
+    "name": "Abdomen_CLS",
     "n_gpu": 1,
 
     "arch": {
-        "type": "MnistModel",
+        "type": "ResNetCLS",
         "args": {}
     },
+    "weights": "data/pretrained_models/ilsvrc-cls_rna-a1_cls1000_ep-0001.params",
     "data_loader": {
-        "type": "MnistDataLoader",
+        "type": "AbdomenDataLoader",
         "args":{
-            "data_dir": "data/",
-            "batch_size": 128,
+            "data_dir": "data/abdomen",
+            "batch_size": 16,
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers": 2
@@ -19,14 +20,14 @@
     "optimizer": {
         "type": "Adam",
         "args":{
-            "lr": 0.001,
+            "lr": 0.0001,
             "weight_decay": 0,
             "amsgrad": true
         }
     },
-    "loss": "nll_loss",
+    "loss": "BCEWithLogitsLoss",
     "metrics": [
-        "accuracy", "top_k_acc"
+        "f1_score"
     ],
     "lr_scheduler": {
         "type": "StepLR",
@@ -38,7 +39,7 @@
     "trainer": {
         "epochs": 100,
 
-        "save_dir": "saved/",
+        "save_dir": "saved/abdomen_cls",
         "save_period": 1,
         "verbosity": 2,
         
