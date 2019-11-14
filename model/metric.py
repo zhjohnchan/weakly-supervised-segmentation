@@ -1,4 +1,5 @@
 import torch
+from sklearn.metrics import f1_score as f1
 
 
 def accuracy(output, target):
@@ -18,3 +19,11 @@ def top_k_acc(output, target, k=3):
         for i in range(k):
             correct += torch.sum(pred[:, i] == target).item()
     return correct / len(target)
+
+
+def f1_score(output, target, threshold=0.5):
+    with torch.no_grad():
+        target = target.int()
+        prob = torch.sigmoid(output)
+
+        return f1(target.cpu(), prob.cpu() > threshold, average='macro')
