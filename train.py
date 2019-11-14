@@ -7,6 +7,7 @@ import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_arch
 from parse_config import ConfigParser
+from utils import convert_mxnet_to_torch
 from trainer import Trainer
 
 
@@ -16,6 +17,7 @@ torch.manual_seed(SEED)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 np.random.seed(SEED)
+
 
 def main(config):
     logger = config.get_logger('train')
@@ -48,7 +50,7 @@ def main(config):
 
 
 if __name__ == '__main__':
-    args = argparse.ArgumentParser(description='PyTorch Template')
+    args = argparse.ArgumentParser(description='Weakly Supervised Learning for Medical Image')
     args.add_argument('-c', '--config', default=None, type=str,
                       help='config file path (default: None)')
     args.add_argument('-r', '--resume', default=None, type=str,
