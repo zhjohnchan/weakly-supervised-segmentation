@@ -1,4 +1,5 @@
 import json
+import torch
 import pandas as pd
 from pathlib import Path
 from itertools import repeat
@@ -10,20 +11,24 @@ def ensure_dir(dirname):
     if not dirname.is_dir():
         dirname.mkdir(parents=True, exist_ok=False)
 
+
 def read_json(fname):
     fname = Path(fname)
     with fname.open('rt') as handle:
         return json.load(handle, object_hook=OrderedDict)
+
 
 def write_json(content, fname):
     fname = Path(fname)
     with fname.open('wt') as handle:
         json.dump(content, handle, indent=4, sort_keys=False)
 
+
 def inf_loop(data_loader):
     ''' wrapper function for endless data loader. '''
     for loader in repeat(data_loader):
         yield from loader
+
 
 class MetricTracker:
     def __init__(self, *keys, writer=None):
@@ -47,3 +52,54 @@ class MetricTracker:
     
     def result(self):
         return dict(self._data.average)
+
+
+def convert_mxnet_to_torch(filename):
+    import mxnet
+
+    save_dict = mxnet.nd.load(filename)
+
+    renamed_dict = dict()
+
+    bn_param_mx_pt = {'beta': 'bias', 'gamma': 'weight', 'mean': 'running_mean', 'var': 'running_var'}
+
+    for k, v in save_dict.items():
+
+        v = torch.from_numpy(v.asnumpy())
+        toks = k.split('_')
+
+        if 'conv1a' in toks[0]:
+            renamed_dict['conv1a.weight'] = v
+
+        elif 'linear1000' in toks[0]:
+            pass
+
+        elif 'branch' in toks[1]:
+
+            pt_name = []
+
+            if toks[0][-1] != 'a':
+                pt_name.append('b' + toks[0][-3] + '_' + toks[0][-1])
+            else:
+                pt_name.append('b' + toks[0][-2])
+
+            if 'res' in toks[0]:
+                layer_type = 'conv'
+                last_name = 'weight'
+
+            else:  # 'bn' in toks[0]:
+                layer_type = 'bn'
+                last_name = bn_param_mx_pt[toks[-1]]
+
+            pt_name.append(layer_type + '_' + toks[1])
+
+            pt_name.append(last_name)
+
+            torch_name = '.'.join(pt_name)
+            renamed_dict[torch_name] = v
+
+        else:
+            last_name = bn_param_mx_pt[toks[-1]]
+            renamed_dict['bn7.' + last_name] = v
+
+    return renamed_dict
