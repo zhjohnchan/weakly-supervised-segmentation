@@ -1,11 +1,17 @@
+import os
 import argparse
 import torch
+import numpy as np
+import torch.nn.functional as F
 from tqdm import tqdm
 import data_loader.data_loaders as module_data
 import model.loss as module_loss
 import model.metric as module_metric
 import model.model as module_arch
 from parse_config import ConfigParser
+from utils import vis_res
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def main(config):
@@ -14,7 +20,7 @@ def main(config):
     # setup data_loader instances
     data_loader = getattr(module_data, config['data_loader']['type'])(
         config['data_loader']['args']['data_dir'],
-        batch_size=512,
+        batch_size=1,
         shuffle=False,
         validation_split=0.0,
         training=False,
@@ -43,15 +49,25 @@ def main(config):
 
     total_loss = 0.0
     total_metrics = torch.zeros(len(metric_fns))
-
+    n_class = config['arch']['args']['n_class']
     with torch.no_grad():
-        for i, (data, target) in enumerate(tqdm(data_loader)):
+        for idx, (data, gt, target) in enumerate(tqdm(data_loader)):
             data, target = data.to(device), target.to(device)
+            output_cams = model.forward_cam(data)
             output = model(data)
 
-            #
-            # save sample images, or do something with output here
-            #
+            # Save sample images(CAMs)
+            cam = F.upsample(output_cams, data.shape[2:], mode='bilinear', align_corners=False)[0]
+            cam = cam.cpu().numpy() * target.cpu().clone().view(n_class, 1, 1).numpy()
+            norm_cam = cam / (np.max(cam, (1, 2), keepdims=True) + 1e-5)
+            cam_dict = {}
+            for i in range(n_class):
+                if target[0][i] > 1e-5:
+                    cam_dict[i] = norm_cam[i]
+            bg_score = [np.ones_like(norm_cam[0]) * 0.2]
+            pred = np.argmax(np.concatenate((bg_score, norm_cam)), 0)
+            save_path = os.path.join('saved', 'cams', str(idx) + '.png')
+            vis_res(data[0][0].cpu(), gt[0].cpu().numpy().astype(np.uint8), pred.astype(np.uint8), save_path)
 
             # computing loss, metrics on test set
             loss = loss_fn(output, target)
@@ -59,6 +75,7 @@ def main(config):
             total_loss += loss.item() * batch_size
             for i, metric in enumerate(metric_fns):
                 total_metrics[i] += metric(output, target) * batch_size
+
 
     n_samples = len(data_loader.sampler)
     log = {'loss': total_loss / n_samples}
@@ -69,7 +86,7 @@ def main(config):
 
 
 if __name__ == '__main__':
-    args = argparse.ArgumentParser(description='PyTorch Template')
+    args = argparse.ArgumentParser(description='Weakly supervised learning for Medical Image')
     args.add_argument('-c', '--config', default=None, type=str,
                       help='config file path (default: None)')
     args.add_argument('-r', '--resume', default=None, type=str,

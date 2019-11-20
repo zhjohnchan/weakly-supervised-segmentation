@@ -1,6 +1,8 @@
 import json
 import torch
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from pathlib import Path
 from itertools import repeat
 from collections import OrderedDict
@@ -103,3 +105,42 @@ def convert_mxnet_to_torch(filename):
             renamed_dict['bn7.' + last_name] = v
 
     return renamed_dict
+
+
+def create_pascal_label_colormap():
+    colormap = np.zeros((256, 3), dtype=int)
+    ind = np.arange(256, dtype=int)
+
+    for shift in reversed(range(8)):
+        for channel in range(3):
+            colormap[:, channel] |= ((ind >> channel) & 1) << shift
+        ind >>= 3
+
+    return colormap
+
+
+def label_to_color_image(label):
+    if label.ndim != 2:
+        raise ValueError('Expect 2-D input label')
+
+    colormap = create_pascal_label_colormap()
+
+    if np.max(label) >= len(colormap):
+        raise ValueError('label value too large.')
+
+    return colormap[label]
+
+
+def vis_res(image, gt, pred, path):
+    plt.clf()
+    pred = label_to_color_image(pred).astype(np.uint8)
+    plt.subplot(1, 2, 1)
+    plt.imshow(image, cmap="Greys_r")
+    plt.imshow(pred, alpha=0.7)
+    plt.axis('off')
+    gt = label_to_color_image(gt).astype(np.uint8)
+    plt.subplot(1, 2, 2)
+    plt.imshow(image, cmap="Greys_r")
+    plt.imshow(gt, alpha=0.7)
+    plt.axis('off')
+    plt.savefig(path, bbox_inches='tight')

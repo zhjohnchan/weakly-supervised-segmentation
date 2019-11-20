@@ -9,6 +9,8 @@ import model.model as module_arch
 from parse_config import ConfigParser
 from utils import convert_mxnet_to_torch
 from trainer import Trainer
+import warnings
+warnings.filterwarnings("ignore")
 
 
 # fix random seeds for reproducibility
