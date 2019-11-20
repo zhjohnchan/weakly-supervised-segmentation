@@ -14,13 +14,13 @@ This is a repository for our final project of CIE 6004.
 For abdomen dataset, run:
 
 `
-python train.py -c config_abdomen.json
+python train.py -c config/config_abdomen.json
 `
 
 For kidney dataset, run:
 
 `
-python train.py -c config_kidney.json
+python train.py -c config/config_kidney.json
 `
 
 ### Testing
@@ -28,13 +28,13 @@ python train.py -c config_kidney.json
 For abdomen dataset, run:
 
 `
-python test.py -c config_abdomen.json -r <model path>
+python test.py -c config/config_abdomen.json -r <model path>
 `
 
 For kidney dataset, run:
 
 `
-python test.py -c config_kidney.json -r <model path>
+python test.py -c config/config_kidney.json -r <model path>
 `
 
 ## Project Structure
@@ -46,6 +46,8 @@ python test.py -c config_kidney.json -r <model path>
 `data/`: default directory for storing input data
 
 `model/`: models, losses, and metrics
+
+`config/`: default directory for configuration file
 
 `saved/`: default directory for storing output data
 
