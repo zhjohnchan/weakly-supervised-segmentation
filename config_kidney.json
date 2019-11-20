@@ -4,14 +4,14 @@
 
     "arch": {
         "type": "ResNetCLS",
-        "args": {"n_class": 13}
+        "args": {}
     },
     "weights": "data/pretrained_models/ilsvrc-cls_rna-a1_cls1000_ep-0001.params",
     "data_loader": {
         "type": "AbdomenDataLoader",
         "args":{
             "data_dir": "data/abdomen",
-            "batch_size": 8,
+            "batch_size": 16,
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers": 2
