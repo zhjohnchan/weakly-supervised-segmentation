@@ -35,6 +35,7 @@ class AbdomenDataset(Dataset):
                         label[idx, cls-1] = 1
             labels.append(label)
         self.cts = np.vstack(cts).astype('float32')
+        self.cts = self.cts[:, :, :, np.newaxis].repeat(3, 3)
         self.cts = self.cts / self.cts.max()
         self.gts = np.vstack(gts)
         self.labels = np.vstack(labels).astype('float32')
@@ -47,6 +48,7 @@ class AbdomenDataset(Dataset):
             idx = idx.tolist()
         sample = (self.transform(self.cts[idx]), self.gts[idx], torch.tensor(self.labels[idx]))
         return sample
+
 
 class KidneyDataset(Dataset):
     def __init__(self, root_dir, train, transform=None):
@@ -79,6 +81,7 @@ class KidneyDataset(Dataset):
                         label[idx, cls-1] = 1
             labels.append(label)
         self.cts = np.vstack(cts).astype('float32')
+        self.cts = self.cts[:, :, :, np.newaxis].repeat(3, 3)
         self.cts = self.cts / self.cts.max()
         self.gts = np.vstack(gts)
         self.labels = np.vstack(labels).astype('float32')
