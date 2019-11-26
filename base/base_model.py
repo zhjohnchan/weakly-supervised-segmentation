@@ -27,7 +27,7 @@ class BaseModel(nn.Module):
         return super().__str__() + '\nTrainable parameters: {}'.format(params)
 
 
-class ResBlock(nn.Module):
+class ResBlock(BaseModel):
     def __init__(self, in_channels, mid_channels, out_channels, stride=1, first_dilation=None, dilation=1):
         super(ResBlock, self).__init__()
 
@@ -147,7 +147,7 @@ class ResNet(nn.Module):
     def __init__(self):
         super(ResNet, self).__init__()
 
-        self.conv1a = nn.Conv2d(1, 64, 3, padding=1, bias=False)
+        self.conv1a = nn.Conv2d(3, 64, 3, padding=1, bias=False)
 
         self.b2 = ResBlock(64, 128, 128, stride=2)
         self.b2_1 = ResBlock(128, 128, 128)
