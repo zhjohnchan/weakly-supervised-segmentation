@@ -32,7 +32,7 @@ For kidney dataset, run:
 python train_bc.py -c config/config_kidney.json
 `
 
-### Testing without boundary constraint loss
+### Testing with boundary constraint loss
 For kidney dataset, run:
 
 `
