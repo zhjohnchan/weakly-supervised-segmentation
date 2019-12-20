@@ -10,8 +10,8 @@
     "data_loader": {
         "type": "KidneyDataLoader",
         "args":{
-            "data_dir": "data/kidney",
-            "batch_size": 8,
+            "data_dir": "data/kidney_original",
+            "batch_size": 24,
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers": 2

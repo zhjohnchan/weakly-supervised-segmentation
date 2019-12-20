@@ -2,6 +2,7 @@ import os
 import argparse
 import torch
 import numpy as np
+import scipy.misc
 import torch.nn.functional as F
 from tqdm import tqdm
 import data_loader.data_loaders as module_data
@@ -23,7 +24,7 @@ def main(config):
         batch_size=1,
         shuffle=False,
         validation_split=0.0,
-        training=False,
+        training=True,
         num_workers=2
     )
 
@@ -50,6 +51,7 @@ def main(config):
     total_loss = 0.0
     total_metrics = torch.zeros(len(metric_fns))
     n_class = config['arch']['args']['n_class']
+    dataset = config['name'].lower()
     with torch.no_grad():
         for idx, (data, gt, target) in enumerate(tqdm(data_loader)):
             data, target = data.to(device), target.to(device)
@@ -64,9 +66,20 @@ def main(config):
             for i in range(n_class):
                 if target[0][i] > 1e-5:
                     cam_dict[i] = norm_cam[i]
+            if cam_dict == {}: continue
+            # save image
+            save_path = os.path.join('saved', dataset, 'images', str(idx) + '.png')
+            scipy.misc.imsave(save_path, data[0].cpu().permute(1, 2, 0).numpy())
+            # save image
+            save_path = os.path.join('saved', dataset, 'gt', str(idx) + '.npy')
+            np.save(save_path, gt[0])
+            # out cam
+            save_path = os.path.join('saved', dataset, 'cams', str(idx) + '.npy')
+            np.save(save_path, cam_dict)
+            # out cam pred
             bg_score = [np.ones_like(norm_cam[0]) * 0.2]
             pred = np.argmax(np.concatenate((bg_score, norm_cam)), 0)
-            save_path = os.path.join('saved', 'cams', str(idx) + '.png')
+            save_path = os.path.join('saved', dataset, 'cams_pred', str(idx) + '.png')
             vis_res(data[0][0].cpu(), gt[0].cpu().numpy().astype(np.uint8), pred.astype(np.uint8), save_path)
 
             # computing loss, metrics on test set

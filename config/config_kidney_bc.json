@@ -1,17 +1,17 @@
 {
-    "name": "Abdomen_CLS",
+    "name": "KIDNEY_BC",
     "n_gpu": 1,
 
     "arch": {
-        "type": "ResNetCLS",
-        "args": {"n_class": 13}
+        "type": "ResNetBC",
+        "args": {"n_class": 2}
     },
     "weights": "data/pretrained_models/ilsvrc-cls_rna-a1_cls1000_ep-0001.params",
     "data_loader": {
-        "type": "AbdomenDataLoader",
+        "type": "KidneyBCDataLoader",
         "args":{
-            "data_dir": "data/abdomen",
-            "batch_size": 8,
+            "data_dir": "data/kidney_original",
+            "batch_size": 12,
             "shuffle": true,
             "validation_split": 0.1,
             "num_workers": 2
@@ -39,7 +39,7 @@
     "trainer": {
         "epochs": 100,
 
-        "save_dir": "saved/abdomen_cls",
+        "save_dir": "saved/kidney_bc",
         "save_period": 1,
         "verbosity": 2,
         

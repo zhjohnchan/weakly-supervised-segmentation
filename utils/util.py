@@ -144,4 +144,3 @@ def vis_res(image, gt, pred, path):
     plt.imshow(gt, alpha=0.7)
     plt.axis('off')
     plt.savefig(path, bbox_inches='tight')
-
