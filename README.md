@@ -1,22 +1,17 @@
 # weakly-supervised-segmentation
-This is a repository for our final project of CIE 6004.
+This is a repository for our final project of CIE 6004 `weakly supervised medical image segmentation`.
 
 ## Prerequisites
 * python 3
 * PyTorch 1.1.0
 
 ## Data Preparation
+* Download data from `https://kits19.grand-challenge.org/`
 * Create a folder: `mkdir data`
-* Put the dataset to data, i.e. `data/abdomen` and `data/kidney`
+* Put the dataset to data, i.e. `data/kidney_original`
 
 ## Getting Started
-### Training
-For abdomen dataset, run:
-
-`
-python train.py -c config/config_abdomen.json
-`
-
+### Training without boundary constraint loss
 For kidney dataset, run:
 
 `
@@ -24,18 +19,24 @@ python train.py -c config/config_kidney.json
 `
 
 ### Testing
-
-For abdomen dataset, run:
-
-`
-python test.py -c config/config_abdomen.json -r <model path>
-`
-
 For kidney dataset, run:
 
 `
-python test.py -c config/config_kidney.json -r <model path>
+python infer_cls.py -c config/config_kidney.json -r <model path>
 `
+
+### Training with boundary constraint loss
+For kidney dataset, run:
+
+`
+python train_bc.py -c config/config_kidney.json
+`
+
+### Testing
+For kidney dataset, run:
+
+`
+python infer_bc_cls.py -c config/config_kidney.json -r <model path>`
 
 ## Project Structure
 
@@ -56,3 +57,5 @@ python test.py -c config/config_kidney.json -r <model path>
 `logger/`: module for tensorboard visualization and logging
 
 `utils/`: small utility functions
+
+`refine/`: code for post-precessing written in matlab
