@@ -1,6 +1,8 @@
 # weakly-supervised-segmentation
 This is a repository for our final project of CIE 6004 `weakly supervised medical image segmentation`.
 
+![image](https://github.com/zhjohnchan/weakly-supervised-segmentation/blob/master/examples/example.gif)
+
 ## Prerequisites
 * python 3
 * PyTorch 1.1.0
